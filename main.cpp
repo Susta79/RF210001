@@ -295,25 +295,33 @@ Joint IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown, Brand brand, Pose MP
 }
 
 int main(){
-      Joint j, j0, j1, j2, j3, jIK;
+      Joint j, jpos0, jpos1, jpos2, jpos3, jIK;
       Pose p;
-      Pose tool0, tool1, tool2;
-      Pose wobj0, wobj1, wobj2;
+      Pose UT0, UT1;
+      Pose UF0, UF1;
       Pose MP_to_tool0;
 
       // Joint values
-      j0.setall_deg_(0, 0, 0, 0, 0, 0);
-      j1.setall_deg_(90, 0, 0, 0, 0, 0);
-      j2.setall_deg_(45, 45, 45, 45, 45, 45);
-      j3.setall_deg_(-45, -45, -45, -45, -45, -45);
+      jpos0.setall_deg_(0, 0, 0, 0, 0, 0);
+      jpos1.setall_deg_(90, 0, 0, 0, 0, 0);
+      jpos2.setall_deg_(45, 45, 45, 45, 45, 45);
+      jpos3.setall_deg_(-45, -45, -45, -45, -45, -45);
 
       // Set UT values
-      //tool0: << 0, 0, 0, 0, 0, 0;
-      tool0.setpos(0.0, 0.0, 0.0);
-      tool0.setrotFromABC_rad_(0.0, 0.0, 0.0);
-      //tool1: X=200; Y=100; Z=300; A=RX=0; B=RY=60; C=RZ=0
-      tool1.setpos(200.0, 100.0, 300.0);
-      tool1.setrotFromABC_rad_(0.0, 60.0*(M_PI/180.0), 0.0);
+      //UT0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
+      UT0.setpos(0.0, 0.0, 0.0);
+      UT0.setrotFromABC_rad_(0.0, 0.0, 0.0);
+      //UT1: X=200; Y=100; Z=300; A=RX=0; B=RY=60; C=RZ=0;
+      UT1.setpos(200.0, 100.0, 300.0);
+      UT1.setrotFromABC_rad_(0.0, 60.0*(M_PI/180.0), 0.0);
+
+      // Set UF values
+      //UF0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
+      UF0.setpos(0.0, 0.0, 0.0);
+      UF0.setrotFromABC_rad_(0.0, 0.0, 0.0);
+      //UF1: X=1000; Y=-500; Z=750; A=RX=0; B=RY=0; C=RZ=45;
+      UF1.setpos(1000.0, -500.0, 750.0);
+      UF1.setrotFromABC_rad_(0.0, 0.0, 45.0*(M_PI/180.0));
 
       // UT=tool0; UF=wobj0; X=2006.67, Y=20.56, Z=1140.25, A=125.41, B=-18.77, C=93.93;
 
@@ -324,17 +332,12 @@ int main(){
       //Joint << 130, -60, 30, 60, -90, 60;
       //Joint << -46, 46, 46, 46, 46, 46;
 
-      j = j3;
-      p = FK(j, ABB, MP_to_tool0);
-
+      j = jpos0;
       std::cout << "FK - Direct kinematic" << std::endl;
+      p = FK(j, ABB, MP_to_tool0);
       j.print_deg_();
       p.printABC_deg_();
       
-      //std::cout << "FK - Direct kinematic" << std::endl;
-      //std::cout << "Joint: " << std::endl << Joint << std::endl;
-      //std::cout << "XYZABC: " << std::endl << XYZABC << std::endl;
-
       // Inverse kinematic
       // Robot IR
       //XYZABC << 1755, 0, 2660, 0, 0, 0;
@@ -354,9 +357,10 @@ int main(){
       // Up/down configuration : up = false
       // brand : IR (Industrial Robotics), ABB or KUKA
       // tool0 is the transformation to tool 0
-      jIK = IK(p, j, true, true, ABB, MP_to_tool0);
-
+      bool FrontBack = true;
+      bool UpDown = true;
       std::cout << "IK - Inverse kinematic" << std::endl;
+      jIK = IK(p, j, FrontBack, UpDown, ABB, MP_to_tool0);
       p.printABC_deg_();
       jIK.print_deg_();
 }
