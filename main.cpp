@@ -7,19 +7,6 @@
 using namespace std;
 using namespace Eigen;
 
-// Robot del corso.
-// Nel seguito IR (Industrial Robot)
-/*
-#define a1z 650.0
-#define a2x 400.0
-#define a2z 680.0
-#define a3z 1100.0
-#define a4x 766.0
-#define a4z 230.0
-#define a5x 345.0
-#define a6x 244.0
-*/
-
 // ABB 4600-20/2.50
 #define a1z 0.0
 #define a2x 175.0
@@ -131,7 +118,8 @@ Pose FK(Joint j, Brand brand, Pose MP_to_tool0){
                   break;
             case ABB:
                   std::cout << "FK ABB\n";
-                  Rtmp.setrotFromABC_rad_(0.0, 90.0  * (M_PI/180.0), 0.0);
+                  // Rotation 90° around Y
+                  Rtmp.setrotFromABC_rad_(0.0, M_PI/2.0, 0.0);
                   R = R16 * Rtmp.getR();
                   break;
             case KUKA:
@@ -168,8 +156,9 @@ Joint IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown, Brand brand, Pose MP
                   std::cout << "IK ABB\n";
                   // Mounting point MP (Center of the flange of axis 6)      
                   MP.setpos(p.getpos());
-                  Rtmp.setrotFromABC_rad_(0.0, 90.0  * (M_PI/180.0), 0.0);
-                  MP.setrotFromR(p.getR() * (Rtmp.getR()).transpose());
+                  // Rotation 90° around Y
+                  Rtmp.setrotFromABC_rad_(0.0, M_PI/2.0, 0.0);
+                  MP.setrotFromR(Rtmp.getR().transpose() * p.getR());
                   break;
             case KUKA:
                   std::cout << "IK KUKA\n";
@@ -179,7 +168,6 @@ Joint IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown, Brand brand, Pose MP
 
       x_hat = MP.getR() * ((Vector3d() << 1, 0, 0).finished());
       WP = MP.getpos() - (a6x * x_hat);
-      //std::cout << "WP:\n" << WP << std::endl;
 
       // Find J1
       // Check if there is a shoulder singularity

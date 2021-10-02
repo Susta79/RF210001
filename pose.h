@@ -13,7 +13,7 @@ private:
       Vector4d rot;
       Matrix3d RaroundX(double);
       Matrix3d RaroundY(double);
-      Matrix3d RaroundZ(double);
+      Matrix3d RaroundZ(double);      
       Vector4d RtoQ(Matrix3d);
       Matrix3d QtoR(Vector4d);
       Matrix3d ABC_rad_toR(Vector3d);
