@@ -83,10 +83,24 @@ CMakeFiles/RF210001.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RF210001.dir/main.cpp.s"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/main.cpp -o CMakeFiles/RF210001.dir/main.cpp.s
 
+CMakeFiles/RF210001.dir/robot.cpp.o: CMakeFiles/RF210001.dir/flags.make
+CMakeFiles/RF210001.dir/robot.cpp.o: ../robot.cpp
+CMakeFiles/RF210001.dir/robot.cpp.o: CMakeFiles/RF210001.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/RF210001.dir/robot.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RF210001.dir/robot.cpp.o -MF CMakeFiles/RF210001.dir/robot.cpp.o.d -o CMakeFiles/RF210001.dir/robot.cpp.o -c /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/robot.cpp
+
+CMakeFiles/RF210001.dir/robot.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RF210001.dir/robot.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/robot.cpp > CMakeFiles/RF210001.dir/robot.cpp.i
+
+CMakeFiles/RF210001.dir/robot.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RF210001.dir/robot.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/robot.cpp -o CMakeFiles/RF210001.dir/robot.cpp.s
+
 CMakeFiles/RF210001.dir/pose.cpp.o: CMakeFiles/RF210001.dir/flags.make
 CMakeFiles/RF210001.dir/pose.cpp.o: ../pose.cpp
 CMakeFiles/RF210001.dir/pose.cpp.o: CMakeFiles/RF210001.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/RF210001.dir/pose.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/RF210001.dir/pose.cpp.o"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RF210001.dir/pose.cpp.o -MF CMakeFiles/RF210001.dir/pose.cpp.o.d -o CMakeFiles/RF210001.dir/pose.cpp.o -c /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/pose.cpp
 
 CMakeFiles/RF210001.dir/pose.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/RF210001.dir/pose.cpp.s: cmake_force
 CMakeFiles/RF210001.dir/joint.cpp.o: CMakeFiles/RF210001.dir/flags.make
 CMakeFiles/RF210001.dir/joint.cpp.o: ../joint.cpp
 CMakeFiles/RF210001.dir/joint.cpp.o: CMakeFiles/RF210001.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/RF210001.dir/joint.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/RF210001.dir/joint.cpp.o"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RF210001.dir/joint.cpp.o -MF CMakeFiles/RF210001.dir/joint.cpp.o.d -o CMakeFiles/RF210001.dir/joint.cpp.o -c /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/joint.cpp
 
 CMakeFiles/RF210001.dir/joint.cpp.i: cmake_force
@@ -114,6 +128,7 @@ CMakeFiles/RF210001.dir/joint.cpp.s: cmake_force
 # Object files for target RF210001
 RF210001_OBJECTS = \
 "CMakeFiles/RF210001.dir/main.cpp.o" \
+"CMakeFiles/RF210001.dir/robot.cpp.o" \
 "CMakeFiles/RF210001.dir/pose.cpp.o" \
 "CMakeFiles/RF210001.dir/joint.cpp.o"
 
@@ -121,11 +136,12 @@ RF210001_OBJECTS = \
 RF210001_EXTERNAL_OBJECTS =
 
 RF210001: CMakeFiles/RF210001.dir/main.cpp.o
+RF210001: CMakeFiles/RF210001.dir/robot.cpp.o
 RF210001: CMakeFiles/RF210001.dir/pose.cpp.o
 RF210001: CMakeFiles/RF210001.dir/joint.cpp.o
 RF210001: CMakeFiles/RF210001.dir/build.make
 RF210001: CMakeFiles/RF210001.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable RF210001"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable RF210001"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/RF210001.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

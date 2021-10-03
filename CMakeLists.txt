@@ -6,7 +6,7 @@ enable_testing()
 
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
-add_executable(RF210001 main.cpp pose.cpp joint.cpp)
+add_executable(RF210001 main.cpp robot.cpp pose.cpp joint.cpp)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

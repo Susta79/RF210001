@@ -595,6 +595,30 @@ pose.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/pose.cpp.s
 .PHONY : pose.cpp.s
 
+robot.o: robot.cpp.o
+.PHONY : robot.o
+
+# target to build an object file
+robot.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/robot.cpp.o
+.PHONY : robot.cpp.o
+
+robot.i: robot.cpp.i
+.PHONY : robot.i
+
+# target to preprocess a source file
+robot.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/robot.cpp.i
+.PHONY : robot.cpp.i
+
+robot.s: robot.cpp.s
+.PHONY : robot.s
+
+# target to generate assembly for a file
+robot.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/robot.cpp.s
+.PHONY : robot.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -644,6 +668,9 @@ help:
 	@echo "... pose.o"
 	@echo "... pose.i"
 	@echo "... pose.s"
+	@echo "... robot.o"
+	@echo "... robot.i"
+	@echo "... robot.s"
 .PHONY : help
 
 
