@@ -4,6 +4,7 @@
 
 Pose::Pose(void){
       this->pos = Vector3d::Zero();
+      // x, y, z, w
       this->rot = (Vector4d() << 0, 0, 0, 1).finished();
 }
 
@@ -34,13 +35,26 @@ void Pose::setrot(double x, double y, double z, double w){
       this->rot << x, y, z, w;
 }
 
-void Pose::setrotFromABC_rad_(double A, double B, double C){
-      this->rot = this->RtoQ(this->ABC_rad_toR((Array3d() << A, B, C).finished()));
+void Pose::setrot(double RX, double RY, double RZ){
+      double x, y, z, w;
+      // Abbreviations for the various angular functions
+      double cy = cos(RZ * 0.5);
+      double sy = sin(RZ * 0.5);
+      double cp = cos(RY * 0.5);
+      double sp = sin(RY * 0.5);
+      double cr = cos(RX * 0.5);
+      double sr = sin(RX * 0.5);
+
+      x = sr * cp * cy - cr * sp * sy;
+      y = cr * sp * cy + sr * cp * sy;
+      z = cr * cp * sy - sr * sp * cy;
+      w = cr * cp * cy + sr * sp * sy;
+
+      this->rot << x, y, z, w;
 }
 
-void Pose::setrotFromR(Matrix3d R){
-      Vector4d Q = RtoQ(R);
-      this->rot = Q;
+void Pose::setrot(Matrix3d R){
+      this->rot = RtoQ(R);
 }
 
 Vector3d Pose::getpos(){
@@ -51,36 +65,64 @@ Vector4d Pose::getrot(){
       return this->rot;
 }
 
-Vector3d Pose::getrotABC_rad(){
-      return this->RtoABC_rad_(this->QtoR(this->rot));
+//Vector3d Pose::getrotABC_rad(){
+//      return this->RtoEuler(this->QtoR(this->rot));
+//}
+
+/*
+Vector3d Pose::getrotEuler(){
+      Vector3d angles;
+      double t0, t1, t2, t3, t4;
+      double x, y, z, w;
+      double RX, RY, RZ;
+      x = this->rot(0);
+      y = this->rot(1);
+      z = this->rot(2);
+      w = this->rot(3);
+
+      t0 = +2.0 * (w * x + y * z);
+      t1 = +1.0 - 2.0 * (x * x + y * y);
+      RX = atan2(t0, t1);
+      t2 = +2.0 * (w * y - z * x);
+      if (t2 > +1.0)
+            t2 = +1.0;
+      if (t2 < -1.0)
+            t2 = -1.0;
+      RY = asin(t2);
+      t3 = +2.0 * (w * z + x * y);
+      t4 = +1.0 - 2.0 * (y * y + z * z);
+      RZ = atan2(t3, t4);
+      angles << RX, RY, RZ;
+      return angles;
 }
+*/
 
 // Rotation matrix around X. Angle in radiants
-Matrix3d Pose::RaroundX(double A){
+Matrix3d Pose::RaroundX(double RX){
       Matrix3d R;
       // Rotation around X
       R  << 1, 0     , 0      ,
-            0, cos(A), -sin(A),
-            0, sin(A),  cos(A);
+            0, cos(RX), -sin(RX),
+            0, sin(RX),  cos(RX);
       return R;
 }
 
 // Rotation matrix around Y. Angle in radiants
-Matrix3d Pose::RaroundY(double B){
+Matrix3d Pose::RaroundY(double RY){
       Matrix3d R;
       // Rotation around Y
-      R  << cos(B) , 0, sin(B),
+      R  << cos(RY) , 0, sin(RY),
             0      , 1, 0     ,
-            -sin(B), 0, cos(B);
+            -sin(RY), 0, cos(RY);
       return R;
 }
 
 // Rotation matrix around Z. Angle in radiants
-Matrix3d Pose::RaroundZ(double C){
+Matrix3d Pose::RaroundZ(double RZ){
       Matrix3d R;
       // Rotation around Z
-      R  << cos(C), -sin(C), 0,
-            sin(C), cos(C) , 0,
+      R  << cos(RZ), -sin(RZ), 0,
+            sin(RZ), cos(RZ) , 0,
             0     , 0      , 1;
       return R;
 }
@@ -88,32 +130,6 @@ Matrix3d Pose::RaroundZ(double C){
 Vector4d Pose::RtoQ(Matrix3d R){
       // Transform rotation matrix to quaternion
       double x, y, z, w;
-      /*
-      double R11, R21, R31, R12, R22, R32, R13, R23, R33;
-      // Read components of rotation matrix
-      R11 = R(0,0);
-      R21 = R(1,0);
-      R31 = R(2,0);
-      R12 = R(0,1);
-      R22 = R(1,1);
-      R32 = R(2,1);
-      R13 = R(0,2);
-      R23 = R(1,2);
-      R33 = R(2,2);
-      // w = 1/2 * sqrt(1 + R11 + R22 + R33)
-      w = 0.5 * sqrt(1+R11+R22+R33);
-      // x = 1/4w * (R32 - R23)
-      x = (R32-R23) / (4.0*w);
-      // y = 1/4w * (R13 - R31)
-      y = (R13-R31) / (4.0*w);
-      // z = 1/4w * (R21 - R12)
-      z = (R21-R12) / (4.0*w);
-      // Copy value in a 4 dim vector
-      Vector4d Q;
-      Q << x, y, z, w;
-      // Return vector
-      return Q;
-      */
       float trace = R(0,0) + R(1,1) + R(2,2);
       if( trace > 0 ) {
             float s = 0.5f / sqrtf(trace+ 1.0f);
@@ -185,31 +201,10 @@ Matrix3d Pose::QtoR(Vector4d Q){
       return R;
 }
 
-// A, B, C (in radiants) to rotation matrix R
-Matrix3d Pose::ABC_rad_toR(Vector3d ABC){
-      // Get the rotation matrix from euler angles A, B, C
-      double A, B, C;
-      Matrix3d RX, RY, RZ, R;
-      // Read components of rotation matrix
-      A = ABC(0);
-      B = ABC(1);
-      C = ABC(2);
-      // Rotation around X
-      RX = RaroundX(A);
-      // Rotation around Y
-      RY = RaroundY(B);
-      // Rotation around Z
-      RZ = RaroundZ(C);
-      // Create the rotation matrix
-      R = RZ*RY*RX;
-      // Return the rotation matrix
-      return R;
-}
-
-// Rotation matrix R to Euler angles A, B, C (in radiants)
-Vector3d Pose::RtoABC_rad_(Matrix3d R){
-      // Get euler angles A, B, C from rotation matrix
-      double A, B, C;
+// Rotation matrix R to Euler angles RX, RY, RZ (in radiants)
+Vector3d Pose::RtoEuler(Matrix3d R){
+      // Get euler angles RX, RY, RZ from rotation matrix
+      double RX, RY, RZ;
       double R11, R21, R31, R12, R22, R32, R13, R23, R33;
       // Read components of rotation matrix
       R11 = R(0,0);
@@ -225,30 +220,30 @@ Vector3d Pose::RtoABC_rad_(Matrix3d R){
       if (R31 < 1.0){
             if (R31 > -1.0)
             {
-                  B = asin(-R31);
-                  C = atan2(R21, R11);
-                  A = atan2(R32, R33);
+                  RY = asin(-R31);
+                  RZ = atan2(R21, R11);
+                  RX = atan2(R32, R33);
             }
             else // R31 = −1
             {
-                  // Not a unique solution: A − C = atan2(−R23,R22)
-                  B = M_PI_2;
-                  C = atan2(-R23, R22);
-                  A = 0.0;
+                  // Not a unique solution: RX − RZ = atan2(−R23,R22)
+                  RY = M_PI_2;
+                  RZ = atan2(-R23, R22);
+                  RX = 0.0;
             }
       }
       else // R31 = +1
       {
-            // Not a unique solution: A + C = atan2(−R23,R22)
-            B = -M_PI_2;
-            C = atan2(-R23, R22);
-            A = 0.0;
+            // Not a unique solution: RX + RZ = atan2(−R23,R22)
+            RY = -M_PI_2;
+            RZ = atan2(-R23, R22);
+            RX = 0.0;
       }
       // Copy value in a 3 dim vector
-      Vector3d ABC;
-      ABC << A, B, C;
+      Vector3d angles;
+      angles << RX, RY, RZ;
       // Return the vector
-      return ABC;
+      return angles;
 }
 
 Matrix3d Pose::getR(){
@@ -278,8 +273,8 @@ void Pose::print(void){
 }
 
 void Pose::printABC_deg_(void){
-      Array3d ABC;
-      ABC = getrotABC_rad() * 180.0 / M_PI;
+      //Array3d angles = this->getrotEuler() * 180.0 / M_PI;
+      Array3d angles = this->RtoEuler(this->getR()) * 180.0 / M_PI;
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
       std::cout << "pos x: "   << this->pos(0);
@@ -287,8 +282,8 @@ void Pose::printABC_deg_(void){
       std::cout << "; z: " << this->pos(2);
       std::cout << std::endl;
       std::cout << std::setprecision(2);
-      std::cout << "rot A: "   << ABC(0);
-      std::cout << "; B: " << ABC(1);
-      std::cout << "; C: " << ABC(2);
+      std::cout << "rot RX: "   << angles(0);
+      std::cout << "; RY: " << angles(1);
+      std::cout << "; RZ: " << angles(2);
       std::cout << std::endl;
 }

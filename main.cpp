@@ -41,11 +41,10 @@ int main(){
       Pose p;
       Pose UT0, UT1;
       Pose UF0, UF1;
-      Pose MP_to_tool0;
       Robot Rob;
 
       // Robot Industrial robot
-      Rob.setdimensionsIR();
+      Rob.setdimensionsABB();
 
       // Joint values
       jpos0.setall_deg_(0, 0, 0, 0, 0, 0);
@@ -58,26 +57,26 @@ int main(){
       // Set UT values
       //UT0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
       UT0.setpos(0.0, 0.0, 0.0);
-      UT0.setrotFromABC_rad_(0.0, 0.0, 0.0);
+      UT0.setrot(0.0, 0.0, 0.0);
       //UT1: X=200; Y=100; Z=300; A=RX=0; B=RY=60; C=RZ=0;
       UT1.setpos(200.0, 100.0, 300.0);
-      UT1.setrotFromABC_rad_(0.0, 60.0*(M_PI/180.0), 0.0);
+      UT1.setrot(0.0, 60.0*(M_PI/180.0), 0.0);
 
       // Set UF values
       //UF0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
       UF0.setpos(0.0, 0.0, 0.0);
-      UF0.setrotFromABC_rad_(0.0, 0.0, 0.0);
+      UF0.setrot(0.0, 0.0, 0.0);
       //UF1: X=1000; Y=-500; Z=750; A=RX=0; B=RY=0; C=RZ=45;
       UF1.setpos(1000.0, -500.0, 750.0);
-      UF1.setrotFromABC_rad_(0.0, 0.0, 45.0*(M_PI/180.0));
+      UF1.setrot(0.0, 0.0, 45.0*(M_PI/180.0));
 
       // UT=tool0; UF=wobj0; X=2006.67, Y=20.56, Z=1140.25, A=125.41, B=-18.77, C=93.93;
 
-      j = jpos5;
+      j = jpos3;
 
       // Direct kinematic
       std::cout << "FK - Direct kinematic" << std::endl;
-      p = Rob.FK(j, MP_to_tool0);
+      p = Rob.FK(j);
       j.print_deg_();
       p.printABC_deg_();
       
@@ -89,7 +88,7 @@ int main(){
       bool FrontBack = false;
       bool UpDown = false;
       std::cout << "IK - Inverse kinematic" << std::endl;
-      jIK = Rob.IK(p, j, FrontBack, UpDown, MP_to_tool0);
+      jIK = Rob.IK(p, j, FrontBack, UpDown);
       p.printABC_deg_();
       jIK.print_deg_();
 }
