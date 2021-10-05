@@ -3,6 +3,7 @@
 #include "robot.h"
 #include "pose.h"
 #include "joint.h"
+#include "quaternion.h"
 
 Robot::Robot(void){
     this->a1z = 0.0;

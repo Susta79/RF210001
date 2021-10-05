@@ -595,6 +595,30 @@ pose.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/pose.cpp.s
 .PHONY : pose.cpp.s
 
+quaternion.o: quaternion.cpp.o
+.PHONY : quaternion.o
+
+# target to build an object file
+quaternion.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/quaternion.cpp.o
+.PHONY : quaternion.cpp.o
+
+quaternion.i: quaternion.cpp.i
+.PHONY : quaternion.i
+
+# target to preprocess a source file
+quaternion.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/quaternion.cpp.i
+.PHONY : quaternion.cpp.i
+
+quaternion.s: quaternion.cpp.s
+.PHONY : quaternion.s
+
+# target to generate assembly for a file
+quaternion.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RF210001.dir/build.make CMakeFiles/RF210001.dir/quaternion.cpp.s
+.PHONY : quaternion.cpp.s
+
 robot.o: robot.cpp.o
 .PHONY : robot.o
 
@@ -668,6 +692,9 @@ help:
 	@echo "... pose.o"
 	@echo "... pose.i"
 	@echo "... pose.s"
+	@echo "... quaternion.o"
+	@echo "... quaternion.i"
+	@echo "... quaternion.s"
 	@echo "... robot.o"
 	@echo "... robot.i"
 	@echo "... robot.s"
