@@ -18,10 +18,5 @@
   "directory": "/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build",
   "command": "/usr/bin/clang++  -isystem /usr/local/include/eigen3 -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -o CMakeFiles/RF210001.dir/joint.cpp.o -c /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/joint.cpp",
   "file": "/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/joint.cpp"
-},
-{
-  "directory": "/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/build",
-  "command": "/usr/bin/clang++  -isystem /usr/local/include/eigen3 -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -o CMakeFiles/RF210001.dir/quaternion.cpp.o -c /Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/quaternion.cpp",
-  "file": "/Users/fabri/Nextcloud/Project/IR01_IndustrialRobotics/RF210001/quaternion.cpp"
 }
 ]

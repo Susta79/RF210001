@@ -10,7 +10,7 @@ private:
       // x y z
       Vector3d pos;
       // x y z w
-      Vector4d rot;
+      Quaterniond rot;
       Matrix3d RaroundX(double);
       Matrix3d RaroundY(double);
       Matrix3d RaroundZ(double);      
@@ -20,7 +20,7 @@ private:
       Vector3d RtoEuler(Matrix3d);
 public:
       Pose();
-      Pose(Vector3d, Vector4d);
+      Pose(Vector3d, Quaterniond);
       Pose(Vector3d, Matrix3d);
       Pose(Matrix4d);
       void setpos(Vector3d);
@@ -30,7 +30,7 @@ public:
       void setrot(double RX, double RY, double RZ);
       void setrot(Matrix3d R);
       Vector3d getpos();
-      Vector4d getrot();
+      Quaterniond getrot();
       //Vector3d getrotABC_rad();
       Vector3d getrotEuler();
       Matrix3d getR();

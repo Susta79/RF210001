@@ -5,10 +5,10 @@
 Pose::Pose(void){
       this->pos = Vector3d::Zero();
       // x, y, z, w
-      this->rot = (Vector4d() << 0, 0, 0, 1).finished();
+      this->rot.setIdentity();
 }
 
-Pose::Pose(Vector3d pos, Vector4d rot){
+Pose::Pose(Vector3d pos, Quaterniond rot){
       this->pos = pos;
       this->rot = rot;
 }
@@ -32,7 +32,7 @@ void Pose::setpos(Vector3d pos){
 }
 
 void Pose::setrot(double x, double y, double z, double w){
-      this->rot << x, y, z, w;
+      this->rot = Quaterniond(w, x, y, z);
 }
 
 void Pose::setrot(double RX, double RY, double RZ){
@@ -50,7 +50,7 @@ void Pose::setrot(double RX, double RY, double RZ){
       z = cr * cp * sy - sr * sp * cy;
       w = cr * cp * cy + sr * sp * sy;
 
-      this->rot << x, y, z, w;
+      this->rot = Quaterniond(w, x, y, z);
 }
 
 void Pose::setrot(Matrix3d R){
@@ -61,7 +61,7 @@ Vector3d Pose::getpos(){
       return this->pos;
 }
 
-Vector4d Pose::getrot(){
+Quaterniond Pose::getrot(){
       return this->rot;
 }
 
@@ -165,94 +165,13 @@ Vector4d Pose::RtoQ(Matrix3d R){
       return Q;
 }
 
-Matrix3d Pose::QtoR(Vector4d Q){
-      // Transform quaternion to rotation matrix
-      double x, y, z, w;
-      double R11, R21, R31, R12, R22, R32, R13, R23, R33;
-      // Read components of quaternion
-      x = Q(0);
-      y = Q(1);
-      z = Q(2);
-      w = Q(3);
-      // R11 = 1 - 2y^2 - 2z^2
-      R11 = 1 - 2*pow(y,2) - 2*pow(z,2);
-      // R21 = 2xy + 2zw
-      R21 = 2*x*y + 2*z*w;
-      // R31 = 2xz - 2yw
-      R31 = 2*x*z - 2*y*w;
-      // R12 = 2xy - 2zw
-      R12 = 2*x*y - 2*z*w;
-      // R22 = 1 - 2x^2 - 2z^2
-      R22 = 1 - 2*pow(x,2) - 2*pow(z,2);
-      // R32 = 2yz + 2xw
-      R32 = 2*y*z + 2*x*w;
-      // R13 = 2xz + 2yw
-      R13 = 2*x*z + 2*y*w;
-      // R23 = 2yz - 2xw
-      R23 = 2*y*z - 2*x*w;
-      // R33 = 1 - 2x^2 - 2y^2
-      R33 = 1 - 2*pow(x,2) - 2*pow(y,2);
-      // Define rotation matrix
-      Matrix3d R;
-      R <<  R11, R12, R13,
-            R21, R22, R23,
-            R31, R32, R33;
-      // Return rotation matrix
-      return R;
-}
-
-// Rotation matrix R to Euler angles RX, RY, RZ (in radiants)
-Vector3d Pose::RtoEuler(Matrix3d R){
-      // Get euler angles RX, RY, RZ from rotation matrix
-      double RX, RY, RZ;
-      double R11, R21, R31, R12, R22, R32, R13, R23, R33;
-      // Read components of rotation matrix
-      R11 = R(0,0);
-      R21 = R(1,0);
-      R31 = R(2,0);
-      R12 = R(0,1);
-      R22 = R(1,1);
-      R32 = R(2,1);
-      R13 = R(0,2);
-      R23 = R(1,2);
-      R33 = R(2,2);
-
-      if (R31 < 1.0){
-            if (R31 > -1.0)
-            {
-                  RY = asin(-R31);
-                  RZ = atan2(R21, R11);
-                  RX = atan2(R32, R33);
-            }
-            else // R31 = −1
-            {
-                  // Not a unique solution: RX − RZ = atan2(−R23,R22)
-                  RY = M_PI_2;
-                  RZ = atan2(-R23, R22);
-                  RX = 0.0;
-            }
-      }
-      else // R31 = +1
-      {
-            // Not a unique solution: RX + RZ = atan2(−R23,R22)
-            RY = -M_PI_2;
-            RZ = atan2(-R23, R22);
-            RX = 0.0;
-      }
-      // Copy value in a 3 dim vector
-      Vector3d angles;
-      angles << RX, RY, RZ;
-      // Return the vector
-      return angles;
-}
-
 Matrix3d Pose::getR(){
-      return this->QtoR(this->rot);
+      return this->rot.normalized().toRotationMatrix();
 }
 
 Matrix4d Pose::getT(){
       Matrix4d T;
-      T <<  this->getR(), this->pos,
+      T <<  this->rot.normalized().toRotationMatrix(), this->pos,
             0, 0, 0, 1;
       return T;
 }
@@ -265,23 +184,22 @@ void Pose::print(void){
       std::cout << "; z: " << this->pos(2);
       std::cout << std::endl;
       std::cout << std::setprecision(6);
-      std::cout << "rot x: "   << this->rot(0);
-      std::cout << "; y: " << this->rot(1);
-      std::cout << "; z: " << this->rot(2);
-      std::cout << "; w: " << this->rot(3);
+      std::cout << "rot x: "   << this->rot.x();
+      std::cout << "; y: " << this->rot.y();
+      std::cout << "; z: " << this->rot.z();
+      std::cout << "; w: " << this->rot.w();
       std::cout << std::endl;
 }
 
 void Pose::printABC_deg_(void){
-      //Array3d angles = this->getrotEuler() * 180.0 / M_PI;
-      Array3d angles = this->RtoEuler(this->getR()) * 180.0 / M_PI;
+      Array3d angles = this->rot.normalized().toRotationMatrix().eulerAngles(0,1,2) * 180.0 / M_PI;
       std::cout << std::fixed;
-      std::cout << std::setprecision(2);
+      std::cout << std::setprecision(3);
       std::cout << "pos x: "   << this->pos(0);
       std::cout << "; y: " << this->pos(1);
       std::cout << "; z: " << this->pos(2);
       std::cout << std::endl;
-      std::cout << std::setprecision(2);
+      std::cout << std::setprecision(3);
       std::cout << "rot RX: "   << angles(0);
       std::cout << "; RY: " << angles(1);
       std::cout << "; RZ: " << angles(2);

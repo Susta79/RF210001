@@ -23,6 +23,7 @@ public:
     void setdimensionsIR(void);
     void setdimensionsABB(void);
     Pose FK(Joint j);
+    Eigen::Affine3d FK2(Joint j);
     Joint IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown);
 };
 

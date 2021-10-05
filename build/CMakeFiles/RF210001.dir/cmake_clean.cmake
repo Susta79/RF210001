@@ -5,8 +5,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/RF210001.dir/main.cpp.o.d"
   "CMakeFiles/RF210001.dir/pose.cpp.o"
   "CMakeFiles/RF210001.dir/pose.cpp.o.d"
-  "CMakeFiles/RF210001.dir/quaternion.cpp.o"
-  "CMakeFiles/RF210001.dir/quaternion.cpp.o.d"
   "CMakeFiles/RF210001.dir/robot.cpp.o"
   "CMakeFiles/RF210001.dir/robot.cpp.o.d"
   "RF210001"

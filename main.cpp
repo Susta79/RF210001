@@ -80,6 +80,12 @@ int main(){
       j.print_deg_();
       p.printABC_deg_();
       
+      // Direct kinematic
+      std::cout << "FK2 - Direct kinematic" << std::endl;
+      Eigen::Affine3d fk2= Rob.FK2(j);
+      std::cout << "fk2" << std::endl << fk2.matrix() << std::endl;
+      std::cout << "fk2 rotation:" << std::endl << fk2.rotation().eulerAngles(0,1,2) *180.0 / M_PI << std::endl;
+      
       // Inverse kinematic
       // p = TCP position and orientation (in mm and degree)
       // j = Actual values of joints
