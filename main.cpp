@@ -20,7 +20,9 @@ void printAffine3d(Eigen::Affine3d p){
 }
 
 int main(){
-      Joint j, jpos0, jpos1, jpos2, jpos3, jpos4, jpos5, jIK2;
+      Joint j, jIK2;
+      Joint jpos00, jpos01, jpos02, jpos03, jpos04, jpos05, jpos06;
+      Joint jpos07, jpos08, jpos09, jpos10, jpos11, jpos12;
       Robot Rob;
 
       // Set UT values
@@ -43,14 +45,21 @@ int main(){
       Rob.setdimensionsABB();
 
       // Joint values
-      jpos0.setall_deg_(0, 0, 0, 0, 0, 0);
-      jpos1.setall_deg_(90, 0, 0, 0, 0, 0);
-      jpos2.setall_deg_(45, 45, 45, 45, 45, 45);
-      jpos3.setall_deg_(-45, -45, -45, -45, -45, -45);
-      jpos4.setall_deg_(130, -60, 30, 60, -90, 60);
-      jpos5.setall_deg_(-46, 46, 46, 46, 46, 46);
+      jpos00.setall_deg_(  0,  0,  0,  0,  0,  0);
+      jpos01.setall_deg_(-45,  0,  0,  0,  0,  0);
+      jpos02.setall_deg_( 45,  0,  0,  0,  0,  0);
+      jpos03.setall_deg_(  0,-45,  0,  0,  0,  0);
+      jpos04.setall_deg_(  0, 45,  0,  0,  0,  0);
+      jpos05.setall_deg_(  0,  0,-45,  0,  0,  0);
+      jpos06.setall_deg_(  0,  0, 45,  0,  0,  0);
+      jpos07.setall_deg_(  0,  0,  0,-45,  0,  0);
+      jpos08.setall_deg_(  0,  0,  0, 45,  0,  0);
+      jpos09.setall_deg_(  0,  0,  0,  0,-45,  0);
+      jpos10.setall_deg_(  0,  0,  0,  0, 45,  0);
+      jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
+      jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos2;
+      j = jpos00;
 
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
