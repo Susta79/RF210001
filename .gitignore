@@ -36,3 +36,6 @@ build/
 
 # Ignore IDE specific files
 .vscode/
+
+# 
+.DS_Store
