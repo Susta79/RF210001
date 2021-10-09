@@ -2,46 +2,43 @@
 #include <iomanip>
 #include <Eigen/Dense>
 #include "robot.h"
-#include "pose.h"
 #include "joint.h"
 
-using namespace std;
-using namespace Eigen;
-
-// BT (BackTransformation) is used to convert a Pose back using the invert of the
-// transformation poseT in input.
-// ATTENZIONE: NON FUNZIONA CORRETTAMENTE!!!!
-// CI DEVE ESSERE UN BUG DA QUALCHE PARTE!!!!
-Pose BT(Pose p, Pose poseT){
-      Vector3d MP_XYZ;
-      Matrix3d MP_R;
-
-      Matrix3d R_MP_tool0 = poseT.getR();
-      Matrix4d T_tool0_MP;
-      Vector3d MP_to_tool0_pos = poseT.getpos();
-      T_tool0_MP << R_MP_tool0.transpose(), -(R_MP_tool0.transpose()) * MP_to_tool0_pos,
-            0, 0, 0, 1;
-      //std::cout << "T_tool0_MP: " << std::endl << T_tool0_MP << std::endl;
-
-      Matrix4d T_TCP_XYZ;
-      T_TCP_XYZ << MatrixXd::Identity(3,3), p.getpos(),
-            0, 0, 0, 1;
-      //std::cout << "T_TCP_XYZ: " << std::endl << T_TCP_XYZ << std::endl;
-
-      // Mounting point MP (Center of the flange of axis 6)      
-      MP_XYZ << (T_TCP_XYZ * T_tool0_MP).topRightCorner(3,1);
-      MP_R =  p.getR() * R_MP_tool0.transpose();
-      Pose MP(MP_XYZ, MP_R);
-
-      return MP;
+void printAffine3d(Eigen::Affine3d p){
+      Eigen::Vector3d t = p.translation();
+      Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
+      p.rotation().
+      
+      std::cout << std::fixed;
+      std::cout << std::setprecision(2);
+      
+      std::cout << "X: " << t.x();
+      std::cout << "; Y: " << t.y();
+      std::cout << "; Z: " << t.z() << std::endl;
+      std::cout << "RZ: " << r.z();
+      std::cout << "; RY: " << r.y();
+      std::cout << "; RX: " << r.x() << std::endl;
 }
 
 int main(){
-      Joint j, jpos0, jpos1, jpos2, jpos3, jpos4, jpos5, jIK;
-      Pose p;
-      Pose UT0, UT1;
-      Pose UF0, UF1;
+      Joint j, jpos0, jpos1, jpos2, jpos3, jpos4, jpos5, jIK2;
       Robot Rob;
+
+      // Set UT values
+      //UT0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
+      Eigen::Affine3d UT0 = Eigen::Affine3d::Identity();
+      //UT1: X=200; Y=100; Z=300; A=RX=0; B=RY=60; C=RZ=0;
+      Eigen::Affine3d UT1t(Eigen::Translation3d(Eigen::Vector3d(200, 100, 300)));
+      Eigen::Affine3d UT1r(Eigen::AngleAxisd(60.0*M_PI/180.0, Eigen::Vector3d::UnitY()));
+      Eigen::Affine3d UT1 = UT1t * UT1r;
+
+      // Set UF values
+      //UF0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
+      Eigen::Affine3d UF0 = Eigen::Affine3d::Identity();
+      //UF1: X=1000; Y=-500; Z=750; A=RX=0; B=RY=0; C=RZ=45;
+      Eigen::Affine3d UF1t(Eigen::Translation3d(Eigen::Vector3d(1000, -500, 750)));
+      Eigen::Affine3d UF1r(Eigen::AngleAxisd(45.0*M_PI/180.0, Eigen::Vector3d::UnitZ()));
+      Eigen::Affine3d UF1 = UF1t * UF1r;
 
       // Robot Industrial robot
       Rob.setdimensionsABB();
@@ -54,37 +51,12 @@ int main(){
       jpos4.setall_deg_(130, -60, 30, 60, -90, 60);
       jpos5.setall_deg_(-46, 46, 46, 46, 46, 46);
 
-      // Set UT values
-      //UT0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
-      UT0.setpos(0.0, 0.0, 0.0);
-      UT0.setrot(0.0, 0.0, 0.0);
-      //UT1: X=200; Y=100; Z=300; A=RX=0; B=RY=60; C=RZ=0;
-      UT1.setpos(200.0, 100.0, 300.0);
-      UT1.setrot(0.0, 60.0*(M_PI/180.0), 0.0);
+      j = jpos2;
 
-      // Set UF values
-      //UF0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
-      UF0.setpos(0.0, 0.0, 0.0);
-      UF0.setrot(0.0, 0.0, 0.0);
-      //UF1: X=1000; Y=-500; Z=750; A=RX=0; B=RY=0; C=RZ=45;
-      UF1.setpos(1000.0, -500.0, 750.0);
-      UF1.setrot(0.0, 0.0, 45.0*(M_PI/180.0));
-
-      // UT=tool0; UF=wobj0; X=2006.67, Y=20.56, Z=1140.25, A=125.41, B=-18.77, C=93.93;
-
-      j = jpos3;
-
-      // Direct kinematic
-      std::cout << "FK - Direct kinematic" << std::endl;
-      p = Rob.FK(j);
-      j.print_deg_();
-      p.printABC_deg_();
-      
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
-      Eigen::Affine3d fk2= Rob.FK2(j);
-      std::cout << "fk2" << std::endl << fk2.matrix() << std::endl;
-      std::cout << "fk2 rotation:" << std::endl << fk2.rotation().eulerAngles(0,1,2) *180.0 / M_PI << std::endl;
+      Eigen::Affine3d fk2= Rob.FK2(j, UF0);
+      printAffine3d(fk2);
       
       // Inverse kinematic
       // p = TCP position and orientation (in mm and degree)
@@ -93,8 +65,7 @@ int main(){
       // Up/down configuration : up = false
       bool FrontBack = false;
       bool UpDown = false;
-      std::cout << "IK - Inverse kinematic" << std::endl;
-      jIK = Rob.IK(p, j, FrontBack, UpDown);
-      p.printABC_deg_();
-      jIK.print_deg_();
+      std::cout << "IK2 - Inverse kinematic" << std::endl;
+      jIK2 = Rob.IK2(fk2, j, FrontBack, UpDown);
+      jIK2.print_deg_();
 }

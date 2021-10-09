@@ -75,81 +75,41 @@ Pose Robot::FK(Joint j){
     // Link1: Base to Joint 1
     // Translation
     link1.setpos(0.0, 0.0, this->a1z);
-    Eigen::Affine3d l1t(Eigen::Translation3d(Eigen::Vector3d(0, 0, this->a1z)));
     // Rotation around Z
     link1.setrot(0.0, 0.0, j.getj1());
-    Eigen::Affine3d l1r(Eigen::AngleAxisd(j.getj1(), Eigen::Vector3d::UnitZ()));
-    Eigen::Affine3d l1 = l1t * l1r;
-
-    std::cout << "link1.getR(): " << std::endl << link1.getR() << std::endl;
-    std::cout << "Affine l1: " << std::endl << l1.matrix() << std::endl;
 
     // Link2: Joint 1 to Joint 2
     // Translation
     link2.setpos(this->a2x, 0.0, this->a2z);
-    Eigen::Affine3d l2t(Eigen::Translation3d(Eigen::Vector3d(this->a2x, 0, this->a2z)));
     // Rotation around Y
     link2.setrot(0.0, j.getj2(), 0.0);
-    Eigen::Affine3d l2r(Eigen::AngleAxisd(j.getj2(), Eigen::Vector3d::UnitY()));
-    Eigen::Affine3d l2 = l2t * l2r;
-
-    std::cout << "link2.getR(): " << std::endl << link2.getR() << std::endl;
-    std::cout << "Affine l2: " << std::endl << l2.matrix() << std::endl;
 
     // Link3: Joint 2 to Joint 3
     // Translation
     link3.setpos(0.0, 0.0, this->a3z);
-    Eigen::Affine3d l3t(Eigen::Translation3d(Eigen::Vector3d(0, 0, this->a3z)));
     // Rotation around Y
     link3.setrot(0.0, j.getj3(), 0.0);
-    Eigen::Affine3d l3r(Eigen::AngleAxisd(j.getj3(), Eigen::Vector3d::UnitY()));
-    Eigen::Affine3d l3 = l3t * l3r;
-
-    std::cout << "link3.getR(): " << std::endl << link3.getR() << std::endl;
-    std::cout << "Affine l3: " << std::endl << l3.matrix() << std::endl;
 
     // Link4: Joint 3 to Joint 4
     // Translation
     link4.setpos(this->a4x, 0.0, this->a4z);
-    Eigen::Affine3d l4t(Eigen::Translation3d(Eigen::Vector3d(this->a4x, 0, this->a4z)));
     // Rotation around X
     link4.setrot(j.getj4(), 0.0, 0.0);
-    Eigen::Affine3d l4r(Eigen::AngleAxisd(j.getj4(), Eigen::Vector3d::UnitX()));
-    Eigen::Affine3d l4 = l4t * l4r;
-
-    std::cout << "link4.getR(): " << std::endl << link4.getR() << std::endl;
-    std::cout << "Affine l4: " << std::endl << l4.matrix() << std::endl;
 
     // Link5: Joint 4 to Joint 5
     // Translation
     link5.setpos(this->a5x, 0, 0);
-    Eigen::Affine3d l5t(Eigen::Translation3d(Eigen::Vector3d(this->a5x, 0, 0)));
     // Rotation around Y
     link5.setrot(0.0, j.getj5(), 0.0);
-    Eigen::Affine3d l5r(Eigen::AngleAxisd(j.getj5(), Eigen::Vector3d::UnitY()));
-    Eigen::Affine3d l5 = l5t * l5r;
-
-    std::cout << "link5.getR(): " << std::endl << link5.getR() << std::endl;
-    std::cout << "Affine l5: " << std::endl << l5.matrix() << std::endl;
 
     // Link6: Joint 5 to Joint 6
     // Translation
     link6.setpos(this->a6x, 0, 0);
-    Eigen::Affine3d l6t(Eigen::Translation3d(Eigen::Vector3d(this->a6x, 0, 0)));
     // Rotation around X
     link6.setrot(j.getj6(), 0.0, 0.0);
-    Eigen::Affine3d l6r(Eigen::AngleAxisd(j.getj6(), Eigen::Vector3d::UnitX()));
-    Eigen::Affine3d l6 = l6t * l6r;
-
-    std::cout << "link6.getR(): " << std::endl << link6.getR() << std::endl;
-    std::cout << "Affine l6: " << std::endl << l6.matrix() << std::endl;
 
     //T16 = T1*T2*T3*T4*T5*T6;
     T16 = link1.getT() * link2.getT() * link3.getT() * link4.getT() * link5.getT() * link6.getT();
-    std::cout << "T16:\n" << T16 << std::endl;
-
-    Eigen::Affine3d l16 = l1 * l2 * l3 * l4 * l5 * l6;
-    std::cout << "l16:\n" << l16.matrix() << std::endl;
 
     //Matrix4d Ttool0;
     //Ttool0 = XYZABCtoT(tool0);
@@ -157,8 +117,6 @@ Pose Robot::FK(Joint j){
     T = T16;
 
     Vector3d XYZ = T.topRightCorner(3,1);
-    std::cout << "XYZ:\n" << XYZ << std::endl;
-    std::cout << "l16.translation():\n" << l16.translation() << std::endl;
 
     //Rarm = R1*R2*R3;
     //Rarm = link1.getR() * link2.getR() * link3.getR();
@@ -166,8 +124,6 @@ Pose Robot::FK(Joint j){
     //Rwrist = link4.getR() * link5.getR() * link6.getR();
     //R16 = Rarm * Rwrist;
     R16 = T.topLeftCorner(3,3);
-    std::cout << "R16:\n" << R16 << std::endl;
-    std::cout << "l16.rotation():\n" << l16.rotation() << std::endl;
 
     Pose Rtmp;
     switch(this->brand)
@@ -194,7 +150,21 @@ Pose Robot::FK(Joint j){
     return VTR;
 }
 
-Eigen::Affine3d Robot::FK2(Joint j){
+Eigen::Affine3d Robot::FK2(Joint j_, Eigen::Affine3d UF){
+    Joint j = j_;
+    switch(this->brand)
+    {
+        case IR:
+            std::cout << "FK IR\n";
+            break;
+        case ABB:
+            std::cout << "FK ABB\n";
+            j.setj4(-j.getj4());
+            break;
+        case KUKA:
+            std::cout << "FK KUKA\n";
+            break;
+    }
     // Link1: Base to Joint 1
     // Translation
     Eigen::Affine3d l1t(Eigen::Translation3d(Eigen::Vector3d(0, 0, this->a1z)));
@@ -240,24 +210,28 @@ Eigen::Affine3d Robot::FK2(Joint j){
     //T16 = T1*T2*T3*T4*T5*T6;
     Eigen::Affine3d l16 = l1 * l2 * l3 * l4 * l5 * l6;
 
+    //Eigen::Vector3d MPtrans = l16.translation();
+    //Eigen::Matrix3d MProt = l16.rotation();
+
     switch(this->brand)
     {
         case IR:
-            std::cout << "FK IR\n";
             break;
         case ABB:
-            std::cout << "FK ABB\n";
             // Rotation 90° around Y
+            //MProt = MProt * Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitY());
             l16.rotate(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitY()));
             break;
         case KUKA:
-            std::cout << "FK KUKA\n";
             break;
     }
 
-    std::cout << "l16.translation():\n" << l16.translation() << std::endl;
-    std::cout << "l16.rotation():\n" << l16.rotation() << std::endl;
-
+    //Eigen::Affine3d MPt(MPtrans);
+    //Eigen::Affine3d MPr(MProt);
+    //Eigen::Affine3d MP;
+    //MP.translation() = MPtrans;
+    //MP.rotation() = MProt;
+    //MP = MP * MPr;
     return l16;
 }
 
@@ -380,6 +354,163 @@ Joint Robot::IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown){
     //Matrix3d Rarm = RaroundZ(J1) * RaroundY(J2+J3);
     Matrix3d Rarm = pJ1.getR() * pJ23.getR();
     Matrix3d Rwrist = Rarm.transpose() * MP.getR();
+
+    //Find J4, J5, J6
+
+    Rwrist11 = Rwrist(0,0);
+    Rwrist21 = Rwrist(1,0);
+    Rwrist31 = Rwrist(2,0);
+    Rwrist12 = Rwrist(0,1);
+    Rwrist13 = Rwrist(0,2);
+    Rwrist32 = Rwrist(2,1);
+    Rwrist33 = Rwrist(2,2);
+
+    if (Rwrist11 < 0.9999999) {
+        if (Rwrist11 > -0.9999999) {
+            //J5 = acos(Rwrist11);
+            J5 = atan2( sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
+            J4 = atan2(Rwrist21,-Rwrist31);
+            J6 = atan2(Rwrist12,Rwrist13);
+        }
+        else // Rwrist11 = −1 
+        {
+            std::cout << "Rwrist11 = -1" << std::endl;
+            // Wrist singularity. J5 = 180 -> This condition is not
+            // possible because the spherical wrist cannot rotate J5 = 180.
+            // Not a unique solution: J6 − J4 = atan2(Rwrist32,Rwrist33)
+            J5 = M_PI;
+            J4 = jAct.getj4();
+            J6 = atan2(Rwrist32,Rwrist33) + J4;
+        }
+    }
+    else // Rwrist11 = +1
+    {
+        std::cout << "Rwrist11 = +1" << std::endl;
+        // Wrist singularity. J5 = 0
+        // Not a unique solution: J4 + J6 = atan2(Rwrist32,Rwrist33)
+        J5 = 0;
+        J4 = jAct.getj4();
+        J6 = atan2(Rwrist32,Rwrist33) - J4;
+    }
+
+    Joint j(J1, J2, J3, J4, J5, J6);
+    return j;
+}
+
+Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
+    double J1, J2, J3, J4, J5, J6;
+    double Rwrist11, Rwrist21, Rwrist31, Rwrist12, Rwrist13, Rwrist32, Rwrist33;
+    double WPxy, l, h;
+    double rho, b4x;
+    double alpha, beta, gamma, delta;
+    double cos_beta, sin_beta;
+    //Pose of the mounting point (center of the axe 6)
+    Eigen::Affine3d MP = p;
+
+    switch(this->brand)
+    {
+        case IR:
+            std::cout << "IK IR\n";
+            break;
+        case ABB:
+            std::cout << "IK ABB\n";
+            // Mounting point MP (Center of the flange of axis 6)      
+            MP.rotate(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitY()).inverse());
+            break;
+        case KUKA:
+            std::cout << "IK KUKA\n";
+            break;
+    }
+
+    Eigen::Vector3d x_hat = MP.rotation() * Eigen::Vector3d::UnitX();
+    Eigen::Vector3d WP = MP.translation() - (this->a6x * x_hat);
+
+    // Find J1
+    // Check if there is a shoulder singularity
+    if((abs(WP(0)) < 0.001) && (abs(WP(1)) < 0.001)){
+        // In this case we have a shoulder singularity.
+        // Fix J1 as the actual value of J1
+        J1 = jAct.getj1();
+    }
+    else{
+        // FRONT solution
+        J1 = atan2(WP(1), WP(0));
+        // To have the BACK solution I need to add or substract pi
+        if(bFrontBack){
+            // BACK solution is selected
+            if(J1 > 0)
+                J1 -= M_PI;
+            else
+                J1 += M_PI;
+        }
+    }
+
+    // Find J2 and J3
+    WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
+    //std::cout << "WPxy:\n" << WPxy << std::endl;
+
+    if(bFrontBack){
+        // BACK solution
+        l = WPxy + this->a2x;
+    }
+    else{
+        // FRONT solution
+        l = WPxy - this->a2x;
+    }
+    //std::cout << "l:\n" << l << std::endl;
+    h = WP(2) - this->a1z - this->a2z;
+    //std::cout << "h:\n" << h << std::endl;
+
+    rho = sqrt( pow(h,2) + pow(l,2) );
+    //std::cout << "rho:\n" << rho << std::endl;
+    b4x = sqrt( pow(this->a4z,2) + pow(this->a4x+this->a5x,2) );
+    //std::cout << "b4x:\n" << b4x << std::endl;
+    if(rho >= (this->a3z+b4x)){
+        // It is not possible to reach that point
+        std::cout << "Error: impossible to reach that point" << std::endl;
+        return jAct;
+    }
+    if(rho <= abs(a3z-b4x)){
+        // J2 too close to the robot himself
+        std::cout << "Error: J2 too small" << std::endl;
+        return jAct;
+    }
+
+    alpha = atan2(h, l);
+    cos_beta = (pow(rho,2) + pow(a3z,2) - pow(b4x,2)) / (2*rho*a3z);
+    sin_beta = sqrt(1 - pow(cos_beta,2));
+    beta = atan2(sin_beta, cos_beta);
+
+    if(bUpDown){
+        // DOWN solution
+        J2 = M_PI_2 - alpha + beta;
+    }     
+    else{
+        // UP solution
+        J2 = M_PI_2 - alpha - beta;
+    }
+
+    double cos_gamma, sin_gamma;
+    cos_gamma = (pow(this->a3z,2) + pow(b4x,2) - pow(rho,2)) / (2*this->a3z*b4x);
+    sin_gamma = sqrt(1 - pow(cos_gamma,2));
+    gamma = atan2(sin_gamma, cos_gamma);
+
+    delta = atan2(this->a4x+this->a5x, this->a4z);
+
+    J3 = M_PI - gamma - delta;
+
+    //std::cout << "J1:\n" << J1 << std::endl;
+    //std::cout << "J2:\n" << J2 << std::endl;
+    //std::cout << "J3:\n" << J3 << std::endl;
+
+    //Pose pJ1, pJ23;
+    //pJ1.setrot(0.0, 0.0, J1);
+    Eigen::Affine3d pJ1(Eigen::AngleAxisd(J1, Eigen::Vector3d::UnitZ()));
+    //pJ23.setrot(0.0, (J2+J3), 0.0);
+    Eigen::Affine3d pJ23(Eigen::AngleAxisd(J2+J3, Eigen::Vector3d::UnitY()));
+    //Matrix3d Rarm = RaroundZ(J1) * RaroundY(J2+J3);
+    Matrix3d Rarm = pJ1.rotation() * pJ23.rotation();
+    Matrix3d Rwrist = Rarm.transpose() * MP.rotation();
 
     //Find J4, J5, J6
 
