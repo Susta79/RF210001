@@ -7,7 +7,6 @@
 void printAffine3d(Eigen::Affine3d p){
       Eigen::Vector3d t = p.translation();
       Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
-      p.rotation().
       
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
