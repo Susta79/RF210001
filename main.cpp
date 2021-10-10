@@ -61,7 +61,7 @@ int main(){
       jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
       jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos09;
+      j = jpos12;
 
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
@@ -72,11 +72,7 @@ int main(){
       // Inverse kinematic
       // p = TCP position and orientation (in mm and degree)
       // j = Actual values of joints
-      // Front/back configuration : front = false
-      // Up/down configuration : up = false
-      bool FrontBack = false;
-      bool UpDown = false;
       std::cout << "IK2 - Inverse kinematic" << std::endl;
-      jIK2 = Rob.IK2(fk2, j, FrontBack, UpDown);
+      jIK2 = Rob.IK2(fk2, j, Front, Up, Positive);
       jIK2.print_deg_();
 }

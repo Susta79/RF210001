@@ -385,7 +385,7 @@ Joint Robot::IK(Pose p, Joint jAct, bool bFrontBack, bool bUpDown){
     return j;
 }
 
-Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
+Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, FrontBack FB, UpDown UD, PositiveNegative PN){
     double J1, J2, J3, J4, J5, J6;
     double Rwrist11, Rwrist21, Rwrist31, Rwrist12, Rwrist13, Rwrist32, Rwrist33;
     double WPxy, l, h;
@@ -424,7 +424,7 @@ Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
         // FRONT solution
         J1 = atan2(WP(1), WP(0));
         // To have the BACK solution I need to add or substract pi
-        if(bFrontBack){
+        if(FB == Back){
             // BACK solution is selected
             if(J1 > 0)
                 J1 -= M_PI;
@@ -437,13 +437,16 @@ Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
     //std::cout << "WPxy:\n" << WPxy << std::endl;
 
-    if(bFrontBack){
-        // BACK solution
-        l = WPxy + this->a2x;
-    }
-    else{
+    switch (FB)
+    {
+    case Front:
         // FRONT solution
         l = WPxy - this->a2x;
+        break;
+    case Back:
+        // BACK solution
+        l = WPxy + this->a2x;
+        break;
     }
     //std::cout << "l:\n" << l << std::endl;
     h = WP(2) - this->a1z - this->a2z;
@@ -469,13 +472,16 @@ Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
     sin_beta = sqrt(1 - pow(cos_beta,2));
     beta = atan2(sin_beta, cos_beta);
 
-    if(bUpDown){
-        // DOWN solution
-        J2 = M_PI_2 - alpha + beta;
-    }     
-    else{
+    switch (UD)
+    {
+    case Up:
         // UP solution
         J2 = M_PI_2 - alpha - beta;
+        break;
+    case Down:
+        // DOWN solution
+        J2 = M_PI_2 - alpha + beta;
+        break;
     }
 
     double cos_gamma, sin_gamma;
@@ -513,9 +519,19 @@ Joint Robot::IK2(Eigen::Affine3d p, Joint jAct, bool bFrontBack, bool bUpDown){
     if (Rwrist11 < 0.9999999) {
         if (Rwrist11 > -0.9999999) {
             //J5 = acos(Rwrist11);
-            J5 = atan2( sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
-            J4 = atan2(Rwrist21,-Rwrist31);
-            J6 = atan2(Rwrist12,Rwrist13);
+            switch (PN)
+            {
+            case Positive:
+                J5 = atan2( sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
+                J4 = atan2(Rwrist21,-Rwrist31);
+                J6 = atan2(Rwrist12,Rwrist13);
+                break;
+            case Negative:
+                J5 = atan2( -sqrt(1-pow(Rwrist11,2)) , Rwrist11 );
+                J4 = atan2(-Rwrist21,Rwrist31);
+                J6 = atan2(-Rwrist12,-Rwrist13);
+                break;
+            }
         }
         else // Rwrist11 = −1 
         {
