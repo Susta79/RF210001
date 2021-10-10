@@ -6,7 +6,7 @@
 
 void printAffine3d(Eigen::Affine3d p){
       Eigen::Vector3d t = p.translation();
-      Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
+      //Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
       Eigen::Quaterniond q(p.rotation());
       
       std::cout << std::fixed;
@@ -14,10 +14,9 @@ void printAffine3d(Eigen::Affine3d p){
       std::cout << "X: " << t.x();
       std::cout << "; Y: " << t.y();
       std::cout << "; Z: " << t.z() << std::endl;
-      std::cout << "RZ: " << r.z();
-      std::cout << "; RY: " << r.y();
-      std::cout << "; RX: " << r.x() << std::endl;
-
+      //std::cout << "RZ: " << r.z();
+      //std::cout << "; RY: " << r.y();
+      //std::cout << "; RX: " << r.x() << std::endl;
       std::cout << std::setprecision(6);
       std::cout << "Quaternion: " << q << std::endl;
 }
@@ -62,10 +61,11 @@ int main(){
       jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
       jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos02;
+      j = jpos09;
 
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
+      j.print_deg_();
       Eigen::Affine3d fk2= Rob.FK2(j, UF0);
       printAffine3d(fk2);
       
@@ -79,9 +79,4 @@ int main(){
       std::cout << "IK2 - Inverse kinematic" << std::endl;
       jIK2 = Rob.IK2(fk2, j, FrontBack, UpDown);
       jIK2.print_deg_();
-
-      Eigen::Quaterniond q(Eigen::Quaterniond::Identity());
-      std::cout << std::setprecision(6);
-      std::cout << "Quaternion: " << q << std::endl;
-
 }

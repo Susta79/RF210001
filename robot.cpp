@@ -156,7 +156,7 @@ Eigen::Affine3d Robot::FK2(Joint j_, Eigen::Affine3d UF){
             break;
         case ABB:
             std::cout << "FK ABB\n";
-            j.setj4(-j.getj4());
+            //j.setj4(-j.getj4());
             break;
         case KUKA:
             std::cout << "FK KUKA\n";
