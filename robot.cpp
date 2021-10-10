@@ -4,10 +4,7 @@
 #include "pose.h"
 #include "joint.h"
 
-//#include <Eigen/Geometry>
 #include <Eigen/Dense>
-//#include <eigen_conversions/eigen_msg.h>
-//#include <Eigen/Core>
 
 Robot::Robot(void){
     this->a1z = 0.0;
@@ -165,6 +162,7 @@ Eigen::Affine3d Robot::FK2(Joint j_, Eigen::Affine3d UF){
             std::cout << "FK KUKA\n";
             break;
     }
+    
     // Link1: Base to Joint 1
     // Translation
     Eigen::Affine3d l1t(Eigen::Translation3d(Eigen::Vector3d(0, 0, this->a1z)));
@@ -210,28 +208,18 @@ Eigen::Affine3d Robot::FK2(Joint j_, Eigen::Affine3d UF){
     //T16 = T1*T2*T3*T4*T5*T6;
     Eigen::Affine3d l16 = l1 * l2 * l3 * l4 * l5 * l6;
 
-    //Eigen::Vector3d MPtrans = l16.translation();
-    //Eigen::Matrix3d MProt = l16.rotation();
-
     switch(this->brand)
     {
         case IR:
             break;
         case ABB:
             // Rotation 90° around Y
-            //MProt = MProt * Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitY());
             l16.rotate(Eigen::AngleAxisd(M_PI_2, Eigen::Vector3d::UnitY()));
             break;
         case KUKA:
             break;
     }
 
-    //Eigen::Affine3d MPt(MPtrans);
-    //Eigen::Affine3d MPr(MProt);
-    //Eigen::Affine3d MP;
-    //MP.translation() = MPtrans;
-    //MP.rotation() = MProt;
-    //MP = MP * MPr;
     return l16;
 }
 

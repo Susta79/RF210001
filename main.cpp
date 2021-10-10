@@ -7,16 +7,19 @@
 void printAffine3d(Eigen::Affine3d p){
       Eigen::Vector3d t = p.translation();
       Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
+      Eigen::Quaterniond q(p.rotation());
       
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
-      
       std::cout << "X: " << t.x();
       std::cout << "; Y: " << t.y();
       std::cout << "; Z: " << t.z() << std::endl;
       std::cout << "RZ: " << r.z();
       std::cout << "; RY: " << r.y();
       std::cout << "; RX: " << r.x() << std::endl;
+
+      std::cout << std::setprecision(6);
+      std::cout << "Quaternion: " << q << std::endl;
 }
 
 int main(){
@@ -59,7 +62,7 @@ int main(){
       jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
       jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos00;
+      j = jpos01;
 
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
