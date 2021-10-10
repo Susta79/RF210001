@@ -62,7 +62,7 @@ int main(){
       jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
       jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos01;
+      j = jpos02;
 
       // Direct kinematic
       std::cout << "FK2 - Direct kinematic" << std::endl;
@@ -79,4 +79,9 @@ int main(){
       std::cout << "IK2 - Inverse kinematic" << std::endl;
       jIK2 = Rob.IK2(fk2, j, FrontBack, UpDown);
       jIK2.print_deg_();
+
+      Eigen::Quaterniond q(Eigen::Quaterniond::Identity());
+      std::cout << std::setprecision(6);
+      std::cout << "Quaternion: " << q << std::endl;
+
 }
