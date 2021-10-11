@@ -4,27 +4,11 @@
 #include "robot.h"
 #include "joint.h"
 
-void printAffine3d(Eigen::Affine3d p){
-      Eigen::Vector3d t = p.translation();
-      //Eigen::Vector3d r = p.rotation().eulerAngles(2,1,0) * 180.0 / M_PI;
-      Eigen::Quaterniond q(p.rotation());
-      
-      std::cout << std::fixed;
-      std::cout << std::setprecision(2);
-      std::cout << "X: " << t.x();
-      std::cout << "; Y: " << t.y();
-      std::cout << "; Z: " << t.z() << std::endl;
-      //std::cout << "RZ: " << r.z();
-      //std::cout << "; RY: " << r.y();
-      //std::cout << "; RX: " << r.x() << std::endl;
-      std::cout << std::setprecision(6);
-      std::cout << "Quaternion: " << q << std::endl;
-}
-
 int main(){
-      Joint j, jIK2;
+      Joint j, jIK;
       Joint jpos00, jpos01, jpos02, jpos03, jpos04, jpos05, jpos06;
       Joint jpos07, jpos08, jpos09, jpos10, jpos11, jpos12;
+      Joint jpos20, jpos21;
       Robot Rob;
 
       // Set UT values
@@ -61,18 +45,21 @@ int main(){
       jpos11.setall_deg_(  0,  0,  0,  0,  0,-45);
       jpos12.setall_deg_(  0,  0,  0,  0,  0, 45);
 
-      j = jpos12;
+      jpos20.setall_deg_(  0,-90, 90,  0,  0,  0);
+      jpos21.setall_deg_(  -61.706, -79.587, 100.372,  -90.605,  88.405, 60.794);
+
+      j = jpos03;
 
       // Direct kinematic
-      std::cout << "FK2 - Direct kinematic" << std::endl;
+      std::cout << "FK - Direct kinematic" << std::endl;
       j.print_deg_();
-      Eigen::Affine3d fk2= Rob.FK2(j, UF0);
-      printAffine3d(fk2);
+      Eigen::Affine3d fk= Rob.FK(j, UT1, UF1);
+      Rob.printAffine3d(fk);
       
       // Inverse kinematic
       // p = TCP position and orientation (in mm and degree)
       // j = Actual values of joints
-      std::cout << "IK2 - Inverse kinematic" << std::endl;
-      jIK2 = Rob.IK2(fk2, j, Front, Up, Positive);
-      jIK2.print_deg_();
+      std::cout << "IK - Inverse kinematic" << std::endl;
+      jIK = Rob.IK(fk, UT1, UF1, j, Front, Up, Positive);
+      jIK.print_deg_();
 }

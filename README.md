@@ -39,6 +39,20 @@ ABB: tool0: Z forward, X downward = rotation of 90° around Y of the base frame.
 #define a5x 0.0
 #define a6x 85.0
 
+### Kuka KR70 R2100
+| a1z | a2x | a2z | a3z | a4x | a4z | a5x | a6x |
+|-----|-----|-----|-----|-----|-----|-----|-----|
+|  0  | 175 | 575 | 890 | 1035|  50 |  0  | 185 |
+
+#define a1z 0.0
+#define a2x 175.0
+#define a2z 575.0
+#define a3z 890.0
+#define a4x 1035.0
+#define a4z 50.0
+#define a5x 0.0
+#define a6x 185.0
+
 ## Test dataset
 
 | jpos  |  j1 |  j2 |  j3 |  j4 |  j5 |  j6 |
