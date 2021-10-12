@@ -27,8 +27,8 @@ int main(){
       Eigen::Affine3d UF1r(Eigen::AngleAxisd(45.0*M_PI/180.0, Eigen::Vector3d::UnitZ()));
       Eigen::Affine3d UF1 = UF1t * UF1r;
 
-      // Robot Industrial robot
-      Rob.setdimensionsABB();
+      // Robot
+      Rob.setdimensionsKUKA();
 
       // Joint values
       jpos00.setall_deg_(  0,  0,  0,  0,  0,  0);
@@ -48,18 +48,18 @@ int main(){
       jpos20.setall_deg_(  0,-90, 90,  0,  0,  0);
       jpos21.setall_deg_(  -61.706, -79.587, 100.372,  -90.605,  88.405, 60.794);
 
-      j = jpos03;
+      j = jpos21;
 
       // Direct kinematic
       std::cout << "FK - Direct kinematic" << std::endl;
       j.print_deg_();
-      Eigen::Affine3d fk= Rob.FK(j, UT1, UF1);
+      Eigen::Affine3d fk= Rob.FK(j, UT0, UF0);
       Rob.printAffine3d(fk);
       
       // Inverse kinematic
       // p = TCP position and orientation (in mm and degree)
       // j = Actual values of joints
       std::cout << "IK - Inverse kinematic" << std::endl;
-      jIK = Rob.IK(fk, UT1, UF1, j, Front, Up, Positive);
+      jIK = Rob.IK(fk, UT0, UF0, j, Front, Up, Positive);
       jIK.print_deg_();
 }

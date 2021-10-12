@@ -185,8 +185,6 @@ Eigen::Affine3d Robot::FK(Joint j_, Eigen::Affine3d UT, Eigen::Affine3d UF){
             break;
     }
 
-    //Eigen::Affine3d T = UF * l16 * UT;
-
     return UF.inverse() * l16 * UT;
 }
 
@@ -197,10 +195,13 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
     double rho, b4x;
     double alpha, beta, gamma, delta;
     double cos_beta, sin_beta;
-    //Pose of the mounting point (center of the axe 6)
-    Eigen::Affine3d MP = p;
+    double cos_gamma, sin_gamma;
+    Eigen::Affine3d MP, pJ1, pJ23;
+    Eigen::Vector3d x_hat, WP;
+    Eigen::Matrix3d Rarm, Rwrist;
 
-    MP = UF * MP * UT.inverse();
+    //Pose of the mounting point (center of the axe 6)
+    MP = UF * p * UT.inverse();
 
     switch(this->brand)
     {
@@ -219,8 +220,8 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
             break;
     }
 
-    Eigen::Vector3d x_hat = MP.rotation() * Eigen::Vector3d::UnitX();
-    Eigen::Vector3d WP = MP.translation() - (this->a6x * x_hat);
+    x_hat = MP.rotation() * Eigen::Vector3d::UnitX();
+    WP = MP.translation() - (this->a6x * x_hat);
 
     // Find J1
     // Check if there is a shoulder singularity
@@ -244,7 +245,6 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
 
     // Find J2 and J3
     WPxy = sqrt( pow(WP(0),2) + pow(WP(1),2) );
-    //std::cout << "WPxy:\n" << WPxy << std::endl;
 
     switch (FB)
     {
@@ -257,14 +257,10 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
         l = WPxy + this->a2x;
         break;
     }
-    //std::cout << "l:\n" << l << std::endl;
     h = WP(2) - this->a1z - this->a2z;
-    //std::cout << "h:\n" << h << std::endl;
 
     rho = sqrt( pow(h,2) + pow(l,2) );
-    //std::cout << "rho:\n" << rho << std::endl;
     b4x = sqrt( pow(this->a4z,2) + pow(this->a4x+this->a5x,2) );
-    //std::cout << "b4x:\n" << b4x << std::endl;
     if(rho >= (this->a3z+b4x)){
         // It is not possible to reach that point
         std::cout << "Error: impossible to reach that point" << std::endl;
@@ -293,30 +289,21 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
         break;
     }
 
-    double cos_gamma, sin_gamma;
     cos_gamma = (pow(this->a3z,2) + pow(b4x,2) - pow(rho,2)) / (2*this->a3z*b4x);
     sin_gamma = sqrt(1 - pow(cos_gamma,2));
     gamma = atan2(sin_gamma, cos_gamma);
-
     delta = atan2(this->a4x+this->a5x, this->a4z);
 
     J3 = M_PI - gamma - delta;
 
-    //std::cout << "J1:\n" << J1 << std::endl;
-    //std::cout << "J2:\n" << J2 << std::endl;
-    //std::cout << "J3:\n" << J3 << std::endl;
+    // Calculate Rarm from the values of J1, J2, J3
+    pJ1 = Eigen::AngleAxisd(J1, Eigen::Vector3d::UnitZ());
+    pJ23 = Eigen::AngleAxisd(J2+J3, Eigen::Vector3d::UnitY());
+    Rarm = pJ1.rotation() * pJ23.rotation();
+    // R = Rarm * Rwrist -> Rwrist = Rarm^T * R
+    Rwrist = Rarm.transpose() * MP.rotation();
 
-    //Pose pJ1, pJ23;
-    //pJ1.setrot(0.0, 0.0, J1);
-    Eigen::Affine3d pJ1(Eigen::AngleAxisd(J1, Eigen::Vector3d::UnitZ()));
-    //pJ23.setrot(0.0, (J2+J3), 0.0);
-    Eigen::Affine3d pJ23(Eigen::AngleAxisd(J2+J3, Eigen::Vector3d::UnitY()));
-    //Matrix3d Rarm = RaroundZ(J1) * RaroundY(J2+J3);
-    Matrix3d Rarm = pJ1.rotation() * pJ23.rotation();
-    Matrix3d Rwrist = Rarm.transpose() * MP.rotation();
-
-    //Find J4, J5, J6
-
+    //Find J4, J5, J6 from Rwrist
     Rwrist11 = Rwrist(0,0);
     Rwrist21 = Rwrist(1,0);
     Rwrist31 = Rwrist(2,0);
@@ -327,7 +314,6 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
 
     if (Rwrist11 < 0.9999999) {
         if (Rwrist11 > -0.9999999) {
-            //J5 = acos(Rwrist11);
             switch (PN)
             {
             case Positive:
@@ -344,7 +330,6 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
         }
         else // Rwrist11 = −1 
         {
-            std::cout << "Rwrist11 = -1" << std::endl;
             // Wrist singularity. J5 = 180 -> This condition is not
             // possible because the spherical wrist cannot rotate J5 = 180.
             // Not a unique solution: J6 − J4 = atan2(Rwrist32,Rwrist33)
@@ -355,7 +340,6 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
     }
     else // Rwrist11 = +1
     {
-        std::cout << "Rwrist11 = +1" << std::endl;
         // Wrist singularity. J5 = 0
         // Not a unique solution: J4 + J6 = atan2(Rwrist32,Rwrist33)
         J5 = 0;
@@ -366,13 +350,10 @@ Joint Robot::IK(Eigen::Affine3d p, Eigen::Affine3d UT, Eigen::Affine3d UF, Joint
     switch(this->brand)
     {
         case IR:
-            std::cout << "FK IR\n";
             break;
         case ABB:
-            std::cout << "FK ABB\n";
             break;
         case KUKA:
-            std::cout << "FK KUKA\n";
             J1 = -J1;
             J2 -= M_PI_2;
             J3 += M_PI_2;
