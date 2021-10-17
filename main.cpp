@@ -1,10 +1,34 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <filesystem>
 #include <iomanip>
 #include <Eigen/Dense>
 #include "robot.h"
 #include "joint.h"
 
+namespace fs = std::filesystem;
+
 int main(){
+      //for (const auto & entry : fs::directory_iterator(p1.c_str()))
+      //      std::cout << entry.path() << std::endl;
+      fs::path pathCfgFolder = fs::current_path().concat("/../cfg/");
+      fs::path pathCfgFile = pathCfgFolder.concat("ABB_4600_20_250.cfg");
+      std::ifstream infile(pathCfgFile.c_str());
+      std::string line;
+      if(infile.is_open()){
+            while (std::getline(infile, line)){
+                  std::cout << line << '\n';
+                  size_t f = line.find_first_of(" ");
+                  std::cout << "Fisrt part: " << line.substr(0,f) << '\n';
+                  std::cout << "Second part: " << line.substr(f+1,line.size()-f) << '\n';
+            }
+      }
+      else{
+            std::cout << "File not open!" << '\n';
+      }
+      
       Joint j, jIK;
       Joint jpos00, jpos01, jpos02, jpos03, jpos04, jpos05, jpos06;
       Joint jpos07, jpos08, jpos09, jpos10, jpos11, jpos12;

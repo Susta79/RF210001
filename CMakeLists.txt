@@ -4,6 +4,8 @@ project(RF210001 VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
+set(CMAKE_CXX_STANDARD 17)
+
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 add_executable(RF210001 main.cpp robot.cpp joint.cpp)
