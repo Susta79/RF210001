@@ -9,31 +9,38 @@
 #include "joint.h"
 
 namespace fs = std::filesystem;
+using namespace std;
 
 int main(){
+      /*
       //for (const auto & entry : fs::directory_iterator(p1.c_str()))
       //      std::cout << entry.path() << std::endl;
       fs::path pathCfgFolder = fs::current_path().concat("/../cfg/");
       fs::path pathCfgFile = pathCfgFolder.concat("ABB_4600_20_250.cfg");
       std::ifstream infile(pathCfgFile.c_str());
-      std::string line;
+      string line, par_name, par_val;
       if(infile.is_open()){
             while (std::getline(infile, line)){
                   std::cout << line << '\n';
                   size_t f = line.find_first_of(" ");
-                  std::cout << "Fisrt part: " << line.substr(0,f) << '\n';
-                  std::cout << "Second part: " << line.substr(f+1,line.size()-f) << '\n';
+                  par_name = line.substr(0,f);
+                  par_val = line.substr(f+1,line.size()-f);
+                  std::cout << "par_name: " << par_name;
+                  std::cout << "; par_val: " << par_val << '\n';
             }
       }
       else{
             std::cout << "File not open!" << '\n';
       }
+      */
       
       Joint j, jIK;
       Joint jpos00, jpos01, jpos02, jpos03, jpos04, jpos05, jpos06;
       Joint jpos07, jpos08, jpos09, jpos10, jpos11, jpos12;
       Joint jpos20, jpos21;
-      Robot Rob;
+
+      // Robot
+      Robot Rob(ABB, "4600_20_250");
 
       // Set UT values
       //UT0: X=0; Y=0; Z=0; A=RX=0; B=RY=0; C=RZ=0;
@@ -50,9 +57,6 @@ int main(){
       Eigen::Affine3d UF1t(Eigen::Translation3d(Eigen::Vector3d(1000, -500, 750)));
       Eigen::Affine3d UF1r(Eigen::AngleAxisd(45.0*M_PI/180.0, Eigen::Vector3d::UnitZ()));
       Eigen::Affine3d UF1 = UF1t * UF1r;
-
-      // Robot
-      Rob.setdimensionsKUKA();
 
       // Joint values
       jpos00.setall_deg_(  0,  0,  0,  0,  0,  0);

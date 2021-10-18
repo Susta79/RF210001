@@ -1,9 +1,15 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
+#include <string>
+#include <Eigen/Dense>
+#include <filesystem>
 #include "robot.h"
 #include "joint.h"
 
-#include <Eigen/Dense>
+using namespace std;
+using namespace Eigen;
+namespace fs = std::filesystem;
 
 Robot::Robot(void){
     this->a1z = 0.0;
@@ -15,6 +21,60 @@ Robot::Robot(void){
     this->a5x = 0.0;
     this->a6x = 0.0;
     this->brand = IR;
+    this->model = "";
+}
+
+string Robot::brand_string(){
+    switch (this->brand)
+    {
+    case ABB:
+        return "ABB";
+    case KUKA:
+        return "KUKA";
+    case IR:
+        return "IR";
+    default:
+        return "";
+        break;
+    }
+}
+
+Robot::Robot(Brand b, string m){
+    this->brand = b;
+    this->model = m;
+    string filename = this->brand_string() + "_" + this->model + ".cfg";
+    fs::path pathCfgFolder = fs::current_path().concat("/../cfg/");
+    fs::path pathCfgFile = pathCfgFolder.concat(filename);
+    ifstream infile(pathCfgFile.c_str());
+    string line, par_name, par_val;
+    cout << "Loading Robot from file: " << filename << "...";
+    if(infile.is_open()){
+        while (getline(infile, line)){
+            size_t f = line.find_first_of(" ");
+            par_name = line.substr(0,f);
+            par_val = line.substr(f+1,line.size()-f);
+            if (par_name == "a1z")
+                this->a1z = stod(par_val);
+            else if (par_name == "a2x")
+                this->a2x = stod(par_val);
+            else if (par_name == "a2z")
+                this->a2z = stod(par_val);
+            else if (par_name == "a3z")
+                this->a3z = stod(par_val);
+            else if (par_name == "a4x")
+                this->a4x = stod(par_val);
+            else if (par_name == "a4z")
+                this->a4z = stod(par_val);
+            else if (par_name == "a5x")
+                this->a5x = stod(par_val);
+            else if (par_name == "a6x")
+                this->a6x = stod(par_val);
+        }
+        cout << " load completed!" << endl;
+    }
+    else{
+        cout << " Error while opening file!" << '\n';
+    }
 }
 
 void Robot::setdimensions(
